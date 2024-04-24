@@ -1,6 +1,6 @@
 # OpenRL
 
-TODO: Add a description of the project.
+Beginning of new era. OpenRL. Please read 440 Project Proposal.pdf for description.
 
 ## Installation
 

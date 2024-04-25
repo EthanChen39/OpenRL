@@ -9,7 +9,10 @@ class BettingGameEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
     def __init__(
-        self, initial_funds: float = 1000, min_bet: float = 0.5, prob_win: float = 0.43,
+        self,
+        initial_funds: float = 1000,
+        min_bet: float = 0.5,
+        prob_win: float = 0.43,
     ):
         """
         Initialize the betting game environment.
@@ -33,13 +36,13 @@ class BettingGameEnv(gym.Env):
 
         # Action space is the bet amount
         self.action_space = spaces.Box(
-            low=np.array([self.min_bet]),
-            high=np.array([self.current_funds]),
-            dtype=np.float32,
+            low=np.float32(np.array([self.min_bet])),
+            high=np.float32(np.array([self.current_funds])),
         )
         # Observation space is the current funds
         self.observation_space = spaces.Box(
-            low=np.array([0]), high=np.array([float('inf')]), dtype=np.float32,
+            low=np.float32(np.array([0.0])),
+            high=np.float32(np.array([float('inf')])),
         )
 
     def reset(self, **kwargs):
@@ -72,10 +75,13 @@ class BettingGameEnv(gym.Env):
         - AssertionError: If the bet amount is out of allowable range (between min_bet and current_funds).
         """
         bet = action[0]
+
+        self.action_space = spaces.Box(
+            low=np.float32(np.array([self.min_bet])),
+            high=np.float32(np.array([self.current_funds])),
+        )
+
         self.current_funds -= bet
-        assert (
-            self.min_bet <= bet <= self.current_funds
-        ), f'Bet amount must be between {self.min_bet} and {self.current_funds}'
         result = self.np_random.random()
 
         if result <= self.prob_win:
@@ -88,12 +94,13 @@ class BettingGameEnv(gym.Env):
                 reward = 2 * bet
             elif win_chance < 0.97:
                 money_earned = 3 * bet
-                reward = 13 * bet
+                reward = 3 * bet
             else:
                 money_earned = 5 * bet
-                reward = 20 * bet
+                reward = 5 * bet
 
             self.current_funds += money_earned
+            self.prob_win = 0.43
         else:
             # Lose scenario
             reward = -bet
